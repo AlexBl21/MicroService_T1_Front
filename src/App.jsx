@@ -1,34 +1,48 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import EstudianteForm from './components/EstudianteForm'
+import EstudianteList from './components/EstudianteList'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [estudiantes, setEstudiantes] = useState([])
+
+  const registrarEstudiante = (nuevoEstudiante) => {
+    setEstudiantes(prev => [...prev, nuevoEstudiante])
+    alert('Estudiante registrado exitosamente!')
+  }
+
+  const eliminarEstudiante = (id) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este estudiante?')) {
+      setEstudiantes(prev => prev.filter(estudiante => estudiante.id !== id))
+    }
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="app">
+      <header className="app-header">
+        <h1>Sistema de Registro de Estudiantes</h1>
+        <div className="header-stats">
+          <span className="stat-item">
+            📊 Total de Estudiantes: <strong>{estudiantes.length}</strong>
+          </span>
+        </div>
+      </header>
+
+      <main className="app-main">
+        <div className="content-container">
+          <section className="form-section">
+            <EstudianteForm onRegistrarEstudiante={registrarEstudiante} />
+          </section>
+          
+          <section className="list-section">
+            <EstudianteList 
+              estudiantes={estudiantes} 
+              onEliminarEstudiante={eliminarEstudiante} 
+            />
+          </section>
+        </div>
+      </main>
+    </div>
   )
 }
 
