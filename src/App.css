@@ -11,6 +11,10 @@ body {
   color: #333;
   position: relative;
   overflow-x: hidden;
+  margin: 0;
+  display: block;
+  place-items: initial;
+  min-width: initial;
 }
 
 /* Efecto de partículas de fondo */
@@ -31,6 +35,7 @@ body::before {
 
 .app {
   min-height: 100vh;
+  width: 100vw;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -93,7 +98,8 @@ body::before {
 
 .app-main {
   flex: 1;
-  padding: 20px;
+  padding: 0;
+  width: 100%;
   height: calc(100vh - 120px); /* Altura total menos el header */
   overflow: hidden;
 }
@@ -101,22 +107,22 @@ body::before {
 .content-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 30px;
+  gap: 25px;
   height: 100%;
-  max-width: 1800px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
 }
 
 .form-section {
   height: 100%;
   overflow-y: auto;
-  padding-right: 15px;
+  padding: 30px 20px 30px 30px;
 }
 
 .list-section {
   height: 100%;
   overflow-y: auto;
-  padding-left: 15px;
+  padding: 30px 30px 30px 20px;
 }
 
 /* Scrollbar personalizada para las secciones */
@@ -202,7 +208,7 @@ body::before {
 
 @media (max-width: 768px) {
   .app-main {
-    padding: 15px;
+    padding: 0;
     height: calc(100vh - 100px);
   }
   
@@ -216,7 +222,7 @@ body::before {
   .list-section {
     height: auto;
     overflow-y: visible;
-    padding: 0;
+    padding: 15px;
   }
   
   .app-header h1 {
@@ -232,7 +238,7 @@ body::before {
 
 @media (max-width: 480px) {
   .app-main {
-    padding: 10px;
+    padding: 0;
   }
   
   .content-container {
