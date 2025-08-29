@@ -103,6 +103,104 @@ const EstudianteList = ({ estudiantes, onEliminarEstudiante }) => {
     </div>
   );
 
+  // Debug: mostrar el estado actual
+
+  // Modal simplificado para testing
+  const ModalDetalles = () => {
+    if (!mostrarModal || !estudianteSeleccionado) {
+      console.log("Modal no se renderiza - mostrarModal:", mostrarModal, "estudianteSeleccionado:", estudianteSeleccionado);
+      return null;
+    }
+    
+    return (
+      <div 
+        className="modal-overlay" 
+        onClick={cerrarModal}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999
+        }}
+      >
+        <div 
+          className="modal-detalles" 
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            background: 'white',
+            borderRadius: '20px',
+            padding: '20px',
+            maxWidth: '500px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h3>👤 Detalles del Estudiante</h3>
+            <button 
+              onClick={cerrarModal}
+              style={{
+                background: '#e74c3c',
+                color: 'white',
+                border: 'none',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                cursor: 'pointer'
+              }}
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div>
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Nombre Completo:</strong> {estudianteSeleccionado.nombre} {estudianteSeleccionado.apellido}
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Código de Estudiante:</strong> {estudianteSeleccionado.codigoEstudiante}
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Carrera:</strong> {estudianteSeleccionado.carrera}
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Fecha de Nacimiento:</strong> {estudianteSeleccionado.fechaNacimiento}
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Correo Electrónico:</strong> {estudianteSeleccionado.correo}
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Fecha de Registro:</strong> {estudianteSeleccionado.fechaRegistro}
+            </div>
+          </div>
+          
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <button 
+              onClick={cerrarModal}
+              style={{
+                background: '#3498db',
+                color: 'white',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '6px',
+                cursor: 'pointer'
+              }}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (estudiantes.length === 0) {
     return (
       <div className="estudiante-list">
@@ -111,6 +209,7 @@ const EstudianteList = ({ estudiantes, onEliminarEstudiante }) => {
           {renderizarTabla(estudiantesEjemplo, true)}
           <div className="no-estudiantes">No hay estudiantes registrados.</div>
         </div>
+        <ModalDetalles />
       </div>
     );
   }
@@ -121,60 +220,7 @@ const EstudianteList = ({ estudiantes, onEliminarEstudiante }) => {
         <h2>Lista de Estudiantes ({estudiantes.length})</h2>
         {renderizarTabla(estudiantes)}
       </div>
-
-      {/* Modal para mostrar detalles completos */}
-      {mostrarModal && estudianteSeleccionado && (
-        <div className="modal-overlay" onClick={cerrarModal}>
-          <div className="modal-detalles" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>👤 Detalles del Estudiante</h3>
-              <button className="btn-cerrar" onClick={cerrarModal}>
-                ✕
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="detalle-grupo">
-                <label>Nombre Completo:</label>
-                <span>
-                  {estudianteSeleccionado.nombre}{" "}
-                  {estudianteSeleccionado.apellido}
-                </span>
-              </div>
-              <div className="detalle-grupo">
-                <label>Código de Estudiante:</label>
-                <span>{estudianteSeleccionado.codigoEstudiante}</span>
-              </div>
-              <div className="detalle-grupo">
-                <label>Carrera:</label>
-                <span>{estudianteSeleccionado.carrera}</span>
-              </div>
-              <div className="detalle-grupo">
-                <label>Fecha de Nacimiento:</label>
-                <span>{estudianteSeleccionado.fechaNacimiento}</span>
-              </div>
-              <div className="detalle-grupo">
-                <label>Correo Electrónico:</label>
-                <span>{estudianteSeleccionado.correo}</span>
-              </div>
-              <div className="detalle-grupo">
-                <label>Fecha de Registro:</label>
-                <span>{estudianteSeleccionado.fechaRegistro}</span>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button
-                className="btn-eliminar"
-                onClick={() => onEliminarEstudiante(estudianteSeleccionado.id)}
-              >
-                🗑️ Eliminar Estudiante
-              </button>
-              <button className="btn-cerrar" onClick={cerrarModal}>
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ModalDetalles />
     </div>
   );
 };
