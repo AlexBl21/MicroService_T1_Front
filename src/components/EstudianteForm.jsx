@@ -1,43 +1,74 @@
-import { useState } from 'react';
-import './EstudianteForm.css';
+import { useState } from "react";
+import "./EstudianteForm.css";
+import {
+  consultarEstudiantes,
+  registrarEstudiante,
+} from "../api/EstudianteApi";
 
 const EstudianteForm = ({ onRegistrarEstudiante }) => {
   const [estudiante, setEstudiante] = useState({
-    nombre: '',
-    apellido: '',
-    fechaNacimiento: '',
-    codigoEstudiante: '',
-    carrera: '',
-    correo: ''
+    nombre: "",
+    apellido: "",
+    fechaNacimiento: "",
+    codigoEstudiante: "",
+    carrera: "",
+    correo: "",
+    documento: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setEstudiante(prev => ({
+    setEstudiante((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (estudiante.nombre && estudiante.apellido && estudiante.fechaNacimiento && 
-        estudiante.codigoEstudiante && estudiante.carrera && estudiante.correo) {
-      onRegistrarEstudiante({
-        ...estudiante,
-        id: Date.now(),
-        fechaRegistro: new Date().toLocaleDateString('es-ES')
-      });
-      setEstudiante({
-        nombre: '',
-        apellido: '',
-        fechaNacimiento: '',
-        codigoEstudiante: '',
-        carrera: '',
-        correo: ''
-      });
+    if (
+      estudiante.nombre &&
+      estudiante.apellido &&
+      estudiante.fechaNacimiento &&
+      estudiante.codigoEstudiante &&
+      estudiante.carrera &&
+      estudiante.correo &&
+      estudiante.documento
+    ) {
+      try {
+        const nuevoEstudiante = {
+          codigo: parseInt(estudiante.codigoEstudiante),
+          nombre: estudiante.nombre,
+          apellido: estudiante.apellido,
+          correo: estudiante.correo,
+          documento: parseInt(estudiante.documento),
+          fecha_nacimiento: estudiante.fechaNacimiento,
+          carrera: estudiante.carrera,
+        };
+
+        const res = await registrarEstudiante(nuevoEstudiante);
+        console.log("Estudiante creado:", res);
+
+        if (onRegistrarEstudiante) onRegistrarEstudiante(res);
+
+        // Limpiar formulario
+        setEstudiante({
+          nombre: "",
+          apellido: "",
+          fechaNacimiento: "",
+          codigoEstudiante: "",
+          carrera: "",
+          correo: "",
+          documento: "",
+        });
+
+        alert("Estudiante registrado con éxito!");
+      } catch (error) {
+        console.error(error);
+        alert("Error al registrar estudiante: " + error.message);
+      }
     } else {
-      alert('Por favor, completa todos los campos');
+      alert("Por favor, completa todos los campos");
     }
   };
 
@@ -100,18 +131,33 @@ const EstudianteForm = ({ onRegistrarEstudiante }) => {
           </div>
         </div>
 
-        {/* Carrera y Correo en filas separadas para mejor legibilidad */}
-        <div className="form-group">
-          <label htmlFor="carrera">Carrera:</label>
-          <input
-            type="text"
-            id="carrera"
-            name="carrera"
-            value={estudiante.carrera}
-            onChange={handleChange}
-            placeholder="Ingrese la carrera"
-            required
-          />
+        {/* Carrera y documento en filas juntas y correo separadas para mejor legibilidad */}
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="carrera">Carrera:</label>
+            <input
+              type="text"
+              id="carrera"
+              name="carrera"
+              value={estudiante.carrera}
+              onChange={handleChange}
+              placeholder="Ingrese la carrera"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="documento">Documento de Identidad:</label>
+            <input
+              type="text"
+              id="documento"
+              name="documento"
+              value={estudiante.documento}
+              onChange={handleChange}
+              placeholder="Ingrese el número de identidad"
+              required
+            />
+          </div>
         </div>
 
         <div className="form-group">
