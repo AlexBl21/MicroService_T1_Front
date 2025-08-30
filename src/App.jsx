@@ -1,14 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EstudianteForm from "./components/EstudianteForm";
 import EstudianteList from "./components/EstudianteList";
+import { consultarEstudiantes } from "./api/EstudianteApi";
 import "./App.css";
 
 function App() {
   const [estudiantes, setEstudiantes] = useState([]);
+  const [cargando, setCargando] = useState(true);
+
+  // Función para cargar estudiantes desde la API
+  const cargarEstudiantes = async () => {
+    try {
+      setCargando(true);
+      const data = await consultarEstudiantes();
+      const estudiantesFormateados = data.map((est) => ({
+        nombre: est.nombre,
+        apellido: est.apellido,
+        fechaNacimiento: est.fecha_nacimiento,
+        codigoEstudiante: est.codigo,
+        carrera: est.carrera,
+        correo: est.correo,
+        documento: est.documento,
+      }));
+      setEstudiantes(estudiantesFormateados);
+    } catch (error) {
+      console.error("Error al cargar estudiantes:", error);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  // Cargar estudiantes al montar el componente
+  useEffect(() => {
+    cargarEstudiantes();
+  }, []);
 
   const registrarEstudiante = (nuevoEstudiante) => {
-    setEstudiantes((prev) => [...prev, nuevoEstudiante]);
-    alert("Estudiante registrado exitosamente!");
+    // Agregar el nuevo estudiante al estado local
+    const estudianteFormateado = {
+      nombre: nuevoEstudiante.nombre,
+      apellido: nuevoEstudiante.apellido,
+      fechaNacimiento: nuevoEstudiante.fecha_nacimiento,
+      codigoEstudiante: nuevoEstudiante.codigo,
+      carrera: nuevoEstudiante.carrera,
+      correo: nuevoEstudiante.correo,
+      documento: nuevoEstudiante.documento,
+    };
+    
+    setEstudiantes((prev) => [...prev, estudianteFormateado]);
   };
 
   const eliminarEstudiante = (id) => {
@@ -55,6 +94,7 @@ function App() {
             <EstudianteList
               estudiantes={estudiantes}
               onEliminarEstudiante={eliminarEstudiante}
+              cargando={cargando}
             />
           </section>
         </div>

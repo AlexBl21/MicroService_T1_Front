@@ -61,8 +61,6 @@ const EstudianteForm = ({ onRegistrarEstudiante }) => {
           correo: "",
           documento: "",
         });
-
-        alert("Estudiante registrado con éxito!");
       } catch (error) {
         console.error(error);
         alert("Error al registrar estudiante: " + error.message);

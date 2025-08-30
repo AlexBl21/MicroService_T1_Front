@@ -1,36 +1,9 @@
-import { consultarEstudiantes } from "../api/EstudianteApi";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./EstudianteList.css";
 
-const EstudianteList = ({ estudiantes, onEliminarEstudiante }) => {
+const EstudianteList = ({ estudiantes, onEliminarEstudiante, cargando }) => {
   const [estudianteSeleccionado, setEstudianteSeleccionado] = useState(null);
   const [mostrarModal, setMostrarModal] = useState(false);
-
-  const [estudiantesData, setEstudiantesData] = useState([]);
-  const [cargando, setCargando] = useState(true);
-
-  useEffect(() => {
-    const obtenerEstudiantes = async () => {
-      try {
-        const data = await consultarEstudiantes();
-        const estudiantesFormateados = data.map((est) => ({
-          nombre: est.nombre,
-          apellido: est.apellido,
-          fechaNacimiento: est.fecha_nacimiento,
-          codigoEstudiante: est.codigo,
-          carrera: est.carrera,
-          correo: est.correo,
-          documento: est.documento,
-        }));
-        setEstudiantesData(estudiantesFormateados);
-        setCargando(false);
-      } catch (error) {
-        console.error("Error al consultar estudiantes:", error);
-        setCargando(false);
-      }
-    };
-    obtenerEstudiantes();
-  }, []);
 
   const verDetalles = (estudiante) => {
     setEstudianteSeleccionado(estudiante);
@@ -42,7 +15,7 @@ const EstudianteList = ({ estudiantes, onEliminarEstudiante }) => {
     setEstudianteSeleccionado(null);
   };
 
-  const renderizarTabla = (estudiantesData) => (
+  const renderizarTabla = (estudiantes) => (
     <div className="tabla-container">
       <table className="estudiantes-tabla">
         <thead>
@@ -53,7 +26,7 @@ const EstudianteList = ({ estudiantes, onEliminarEstudiante }) => {
           </tr>
         </thead>
         <tbody>
-          {estudiantesData.map((estudiante) => (
+          {estudiantes.map((estudiante) => (
             <tr key={estudiante.codigoEstudiante}>
               <td className="codigo-estudiante">
                 {estudiante.codigoEstudiante}
@@ -85,8 +58,6 @@ const EstudianteList = ({ estudiantes, onEliminarEstudiante }) => {
       </table>
     </div>
   );
-
-  // Debug: mostrar el estado actual
 
   // Modal simplificado para testing
   const ModalDetalles = () => {
@@ -202,12 +173,12 @@ const EstudianteList = ({ estudiantes, onEliminarEstudiante }) => {
 
   if (cargando) return <div>Cargando estudiantes...</div>;
 
-  if (estudiantesData.length === 0) {
+  if (estudiantes.length === 0) {
     return (
       <div className="estudiante-list">
         <div className="tabla-container">
           <h2>Lista de Estudiantes</h2>
-          {renderizarTabla(estudiantesData)}
+          {renderizarTabla(estudiantes)}
           <div className="no-estudiantes">No hay estudiantes registrados.</div>
         </div>
         <ModalDetalles />
@@ -218,8 +189,8 @@ const EstudianteList = ({ estudiantes, onEliminarEstudiante }) => {
   return (
     <div className="estudiante-list">
       <div className="tabla-container">
-        <h2>Lista de Estudiantes ({estudiantesData.length})</h2>
-        {renderizarTabla(estudiantesData)}
+        <h2>Lista de Estudiantes ({estudiantes.length})</h2>
+        {renderizarTabla(estudiantes)}
       </div>
       <ModalDetalles />
     </div>
