@@ -146,6 +146,12 @@
   box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
 }
 
+.btn-ver-mas i,
+.btn-eliminar i {
+  font-size: 0.95rem !important;
+  vertical-align: middle;
+}
+
 /* Modal de detalles */
 .modal-overlay {
   position: fixed;

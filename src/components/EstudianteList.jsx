@@ -40,17 +40,21 @@ const EstudianteList = ({ estudiantes, onEliminarEstudiante, cargando }) => {
                   onClick={() => verDetalles(estudiante)}
                   title="Ver detalles completos"
                 >
-                  👁️
+                  <i
+                    className="fa-solid fa-eye"
+                    style={{ fontSize: "1.1rem" }}
+                  ></i>
                 </button>
-                {/* {!esEjemplo && (
-                  <button
-                    className="btn-eliminar"
-                    onClick={() => onEliminarEstudiante(estudiante.id)}
-                    title="Eliminar estudiante"
-                  >
-                    🗑️
-                  </button>
-                )} */}
+                <button
+                  className="btn-eliminar"
+                  onClick={() => onEliminarEstudiante(estudiante)}
+                  title="Eliminar estudiante"
+                >
+                  <i
+                    className="fa-solid fa-trash"
+                    style={{ fontSize: "1.1rem" }}
+                  ></i>
+                </button>
               </td>
             </tr>
           ))}
