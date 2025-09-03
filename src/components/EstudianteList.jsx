@@ -4,6 +4,11 @@ import "./EstudianteList.css";
 const EstudianteList = ({ estudiantes, onEliminarEstudiante, cargando }) => {
   const [estudianteSeleccionado, setEstudianteSeleccionado] = useState(null);
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [modalConfig, setModalConfig] = useState({
+    titulo: "",
+    mensaje: "",
+    onConfirm: null,
+  });
 
   const verDetalles = (estudiante) => {
     setEstudianteSeleccionado(estudiante);
@@ -47,7 +52,7 @@ const EstudianteList = ({ estudiantes, onEliminarEstudiante, cargando }) => {
                 </button>
                 <button
                   className="btn-eliminar"
-                  onClick={() => onEliminarEstudiante(estudiante)}
+                  onClick={() => handleEliminar(estudiante.codigoEstudiante)}
                   title="Eliminar estudiante"
                 >
                   <i
@@ -62,6 +67,16 @@ const EstudianteList = ({ estudiantes, onEliminarEstudiante, cargando }) => {
       </table>
     </div>
   );
+
+  const handleEliminar = async (codigo) => {
+    try {
+      if (onEliminarEstudiante) {
+        onEliminarEstudiante(codigo);
+      }
+    } catch (error) {
+      console.error("Error eliminando estudiante:", error);
+    }
+  };
 
   // Modal simplificado para testing
   const ModalDetalles = () => {

@@ -27,3 +27,16 @@ export const registrarEstudiante = async (estudiante) => {
     }
 }
 
+
+export const eliminarEstudiante = async (codigo) => {
+    try {
+        const response = await axios.delete(`${API_ESTUDIANTES}/${codigo}`);
+        return response.data;
+    } catch (error) {
+        console.error(
+            "Error al eliminar estudiante:",
+            error.response?.data?.error || error.message
+        );
+        throw new Error(error.response?.data?.error || "Error al eliminar estudiante");
+    }       
+}

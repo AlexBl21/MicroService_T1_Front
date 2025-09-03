@@ -3,10 +3,18 @@ import EstudianteForm from "./components/EstudianteForm";
 import EstudianteList from "./components/EstudianteList";
 import { consultarEstudiantes } from "./api/EstudianteApi";
 import "./App.css";
+import ModalGlobal from "./components/ModalGlobal";
+import { eliminarEstudiante as eliminarEstudianteApi } from "./api/EstudianteApi";
 
 function App() {
   const [estudiantes, setEstudiantes] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [modalConfig, setModalConfig] = useState({
+    mostrar: false,
+    titulo: "",
+    mensaje: "",
+    onConfirm: null,
+  });
 
   // Función para cargar estudiantes desde la API
   const cargarEstudiantes = async () => {
@@ -46,18 +54,42 @@ function App() {
       correo: nuevoEstudiante.correo,
       documento: nuevoEstudiante.documento,
     };
-    
+
     setEstudiantes((prev) => [...prev, estudianteFormateado]);
   };
 
-  const eliminarEstudiante = (id) => {
-    if (
-      window.confirm("¿Estás seguro de que quieres eliminar este estudiante?")
-    ) {
-      setEstudiantes((prev) =>
-        prev.filter((estudiante) => estudiante.id !== id)
-      );
-    }
+  const eliminarEstudiante = (codigo) => {
+    setModalConfig({
+      mostrar: true,
+      titulo: "Confirmar eliminación",
+      mensaje: "¿Estás seguro de que quieres eliminar este estudiante?",
+      onConfirm: async () => {
+        try {
+          await eliminarEstudianteApi(codigo); // Llamada a la API
+          setEstudiantes((prev) =>
+            prev.filter((est) => est.codigoEstudiante !== codigo)
+          );
+
+          // Mostrar modal de éxito
+          setModalConfig({
+            mostrar: true,
+            titulo: "Éxito",
+            mensaje: "El estudiante fue eliminado correctamente.",
+            onConfirm: null,
+          });
+        } catch (error) {
+          console.error("Error eliminando estudiante:", error);
+
+          // Mostrar modal de error
+          setModalConfig({
+            mostrar: true,
+            titulo: "Error",
+            mensaje: "No se pudo eliminar el estudiante.",
+            onConfirm: null,
+          });
+        }
+      },
+    });
   };
 
   return (
@@ -99,6 +131,21 @@ function App() {
           </section>
         </div>
       </main>
+
+      <ModalGlobal
+        mostrar={modalConfig.mostrar}
+        titulo={modalConfig.titulo}
+        mensaje={modalConfig.mensaje}
+        onClose={() =>
+          setModalConfig({
+            mostrar: false,
+            titulo: "",
+            mensaje: "",
+            onConfirm: null,
+          })
+        }
+        onConfirm={modalConfig.onConfirm}
+      />
     </div>
   );
 }
