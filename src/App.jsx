@@ -2,19 +2,31 @@ import { useState, useEffect } from "react";
 import EstudianteForm from "./components/EstudianteForm";
 import EstudianteList from "./components/EstudianteList";
 import { consultarEstudiantes } from "./api/EstudianteApi";
-import "./App.css";
 import ModalGlobal from "./components/ModalGlobal";
-import { eliminarEstudiante as eliminarEstudianteApi } from "./api/EstudianteApi";
+import "./App.css";
 
 function App() {
   const [estudiantes, setEstudiantes] = useState([]);
   const [cargando, setCargando] = useState(true);
-  const [modalConfig, setModalConfig] = useState({
-    mostrar: false,
-    titulo: "",
-    mensaje: "",
-    onConfirm: null,
-  });
+
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [modalTitulo, setModalTitulo] = useState("");
+  const [modalMensaje, setModalMensaje] = useState("");
+  const [modalOnConfirm, setModalOnConfirm] = useState(null);
+
+  const abrirModal = (titulo, mensaje, onConfirm) => {
+    setModalTitulo(titulo);
+    setModalMensaje(mensaje);
+    setModalOnConfirm(() => onConfirm || null);
+    setMostrarModal(true);
+  };
+
+  const cerrarModal = () => {
+    setMostrarModal(false);
+    setModalTitulo("");
+    setModalMensaje("");
+    setModalOnConfirm(null);
+  };
 
   // Función para cargar estudiantes desde la API
   const cargarEstudiantes = async () => {
@@ -43,53 +55,47 @@ function App() {
     cargarEstudiantes();
   }, []);
 
-  const registrarEstudiante = (nuevoEstudiante) => {
-    // Agregar el nuevo estudiante al estado local
+  const registrarEstudiante = (nuevo) => {
+    // Acepta tanto formato API (snake_case) como UI (camelCase de la tabla)
     const estudianteFormateado = {
-      nombre: nuevoEstudiante.nombre,
-      apellido: nuevoEstudiante.apellido,
-      fechaNacimiento: nuevoEstudiante.fecha_nacimiento,
-      codigoEstudiante: nuevoEstudiante.codigo,
-      carrera: nuevoEstudiante.carrera,
-      correo: nuevoEstudiante.correo,
-      documento: nuevoEstudiante.documento,
+      nombre: nuevo.nombre,
+      apellido: nuevo.apellido,
+      fechaNacimiento: nuevo.fecha_nacimiento || nuevo.fechaNacimiento,
+      codigoEstudiante: nuevo.codigo || nuevo.codigoEstudiante,
+      carrera: nuevo.carrera,
+      correo: nuevo.correo,
+      documento: nuevo.documento,
     };
 
     setEstudiantes((prev) => [...prev, estudianteFormateado]);
   };
 
-  const eliminarEstudiante = (codigo) => {
-    setModalConfig({
-      mostrar: true,
-      titulo: "Confirmar eliminación",
-      mensaje: "¿Estás seguro de que quieres eliminar este estudiante?",
-      onConfirm: async () => {
-        try {
-          await eliminarEstudianteApi(codigo); // Llamada a la API
-          setEstudiantes((prev) =>
-            prev.filter((est) => est.codigoEstudiante !== codigo)
-          );
+  const manejarErrorRegistro = (error) => {
+    // Normalizar mensaje para código duplicado
+    const mensajeError = String(error?.message || "Error al registrar estudiante");
+    const esDuplicado = /duplicate|duplicado|unique|validation/i.test(mensajeError);
 
-          // Mostrar modal de éxito
-          setModalConfig({
-            mostrar: true,
-            titulo: "Éxito",
-            mensaje: "El estudiante fue eliminado correctamente.",
-            onConfirm: null,
-          });
-        } catch (error) {
-          console.error("Error eliminando estudiante:", error);
+    if (esDuplicado) {
+      abrirModal(
+        "No se pudo registrar",
+        "El código de estudiante ya existe. Usa un código diferente."
+      );
+    } else {
+      abrirModal("Error", mensajeError);
+    }
+  };
 
-          // Mostrar modal de error
-          setModalConfig({
-            mostrar: true,
-            titulo: "Error",
-            mensaje: "No se pudo eliminar el estudiante.",
-            onConfirm: null,
-          });
-        }
-      },
-    });
+  const solicitarEliminarEstudiante = (codigoEstudiante) => {
+    abrirModal(
+      "Eliminar estudiante",
+      `¿Seguro que deseas eliminar al estudiante con código ${codigoEstudiante}?`,
+      () => {
+        setEstudiantes((prev) =>
+          prev.filter((est) => est.codigoEstudiante !== codigoEstudiante)
+        );
+        cerrarModal();
+      }
+    );
   };
 
   return (
@@ -119,13 +125,13 @@ function App() {
       <main className="app-main">
         <div className="content-container">
           <section className="form-section">
-            <EstudianteForm onRegistrarEstudiante={registrarEstudiante} />
+            <EstudianteForm onRegistrarEstudiante={registrarEstudiante} onErrorRegistro={manejarErrorRegistro} />
           </section>
 
           <section className="list-section">
             <EstudianteList
               estudiantes={estudiantes}
-              onEliminarEstudiante={eliminarEstudiante}
+              onEliminarEstudiante={solicitarEliminarEstudiante}
               cargando={cargando}
             />
           </section>
@@ -133,18 +139,11 @@ function App() {
       </main>
 
       <ModalGlobal
-        mostrar={modalConfig.mostrar}
-        titulo={modalConfig.titulo}
-        mensaje={modalConfig.mensaje}
-        onClose={() =>
-          setModalConfig({
-            mostrar: false,
-            titulo: "",
-            mensaje: "",
-            onConfirm: null,
-          })
-        }
-        onConfirm={modalConfig.onConfirm}
+        mostrar={mostrarModal}
+        titulo={modalTitulo}
+        mensaje={modalMensaje}
+        onClose={cerrarModal}
+        onConfirm={modalOnConfirm}
       />
     </div>
   );

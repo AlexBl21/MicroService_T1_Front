@@ -5,7 +5,7 @@ import {
   registrarEstudiante,
 } from "../api/EstudianteApi";
 
-const EstudianteForm = ({ onRegistrarEstudiante }) => {
+const EstudianteForm = ({ onRegistrarEstudiante, onErrorRegistro }) => {
   const [estudiante, setEstudiante] = useState({
     nombre: "",
     apellido: "",
@@ -49,7 +49,17 @@ const EstudianteForm = ({ onRegistrarEstudiante }) => {
         const res = await registrarEstudiante(nuevoEstudiante);
         console.log("Estudiante creado:", res);
 
-        if (onRegistrarEstudiante) onRegistrarEstudiante(res);
+        // Enviar al padre en el mismo formato que la tabla espera
+        if (onRegistrarEstudiante)
+          onRegistrarEstudiante({
+            nombre: nuevoEstudiante.nombre,
+            apellido: nuevoEstudiante.apellido,
+            fechaNacimiento: nuevoEstudiante.fecha_nacimiento,
+            codigoEstudiante: nuevoEstudiante.codigo,
+            carrera: nuevoEstudiante.carrera,
+            correo: nuevoEstudiante.correo,
+            documento: nuevoEstudiante.documento,
+          });
 
         // Limpiar formulario
         setEstudiante({
@@ -63,7 +73,11 @@ const EstudianteForm = ({ onRegistrarEstudiante }) => {
         });
       } catch (error) {
         console.error(error);
-        alert("Error al registrar estudiante: " + error.message);
+        if (onErrorRegistro) {
+          onErrorRegistro(error);
+        } else {
+          alert("Error al registrar estudiante: " + error.message);
+        }
       }
     } else {
       alert("Por favor, completa todos los campos");
