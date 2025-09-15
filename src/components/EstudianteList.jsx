@@ -208,7 +208,7 @@ const EstudianteList = ({ estudiantes, onEliminarEstudiante, cargando }) => {
   return (
     <div className="estudiante-list">
       <div className="tabla-container">
-        <h2>Lista de Estudiantes ({estudiantes.length})</h2>
+        <h2>Lista de Estudiantes</h2>
         {renderizarTabla(estudiantes)}
       </div>
       <ModalDetalles />
